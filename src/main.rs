@@ -3,6 +3,8 @@ mod pdf_gen;
 mod geometry_def;
 mod slant_lines_gen;
 mod seyes_lines_gen;
+mod horizontal_lines_gen;
+mod vertical_lines_gen;
 
 use thiserror::Error;
 use geometry_def::{LineDef, GeometryDef, LineSet};
@@ -22,7 +24,11 @@ fn main() -> Result<(), Error> {
             LineSet::Slant(slant_lines) =>
                 slant_lines_gen::create_slant_lines(&slant_lines, &gdef.paper_size, &mut lines)?,
             LineSet::Seyes(seyes_lines) =>
-                seyes_lines_gen::create_seyes_lines(&seyes_lines, &gdef.paper_size, &mut lines)?
+                seyes_lines_gen::create_seyes_lines(&seyes_lines, &gdef.paper_size, &mut lines)?,
+            LineSet::HorizontalLines(horiz_lines) =>
+                horizontal_lines_gen::create_horizontal_lines(&horiz_lines, &gdef.paper_size, &mut lines)?,
+            LineSet::VerticalLines(vert_lines) =>
+                vertical_lines_gen::create_vertical_lines(&vert_lines, &gdef.paper_size, &mut lines)?
         }
     }
 
@@ -46,6 +52,12 @@ pub enum Error {
 
     #[error("Seyes line generation error.")]
     SeyesLinesGenError(#[from] seyes_lines_gen::Error),
+
+    #[error("Horizontal line generation error.")]
+    HorizontalLinesGenError(#[from] horizontal_lines_gen::Error),
+
+    #[error("Vertical line generation error.")]
+    VerticalLinesGenError(#[from] vertical_lines_gen::Error),
 
     #[error("Error when generating the PDF from the lines.")]
     PdfGenError(#[from] pdf_gen::Error)

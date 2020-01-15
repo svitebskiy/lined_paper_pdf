@@ -7,20 +7,19 @@ paper size:
 # The same type of line set can be added more than once.
 line sets:
   -
-    slant:
-      x spacing mm: 10.0
-      slant angle deg: 52.0                 # Must be between 45.0 and 90.0
+    horizontal lines:
+      y spacing mm: 5.0
+      top margin mm: 30.0
+      bottom margin mm: 20.0
       thickness pt: 0.1                     # 0pt thinkness is allowed and it means a signle device pixel or dot
       color cmyk: [0.02, 0.34, 0.0, 0.12]   # Each CMYK value must be between 0.0 and 1.0
   -
-    seyes:
-      y spacing mm: 2.0
-      top margin mm: 30.0
-      bottom margin mm: 20.0
-      base thickness pt: 0.4
-      base color cmyk: [0.02, 0.34, 0.0, 0.12]
-      aux thickness pt: 0.1
-      aux color cmyk: [0.02, 0.34, 0.0, 0.12]
+    vertical lines:
+      x spacing mm: 5.0
+      left margin mm: 30.0
+      right margin mm: 20.0
+      thickness pt: 0.1
+      color cmyk: [0.02, 0.34, 0.0, 0.12]
   -
     single line:
       start:

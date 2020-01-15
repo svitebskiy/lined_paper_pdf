@@ -63,6 +63,34 @@ pub struct SeyesLineSet {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct HorizontalLineSet {
+    #[serde(rename = "y spacing mm")]
+    pub y_spacing: f64,
+    #[serde(rename = "top margin mm")]
+    pub top_margin: f64,
+    #[serde(rename = "bottom margin mm")]
+    pub bottom_margin: f64,
+    #[serde(rename = "thickness pt")]
+    pub thickness: f64,
+    #[serde(rename = "color cmyk")]
+    pub color: CmykDef
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct VerticalLineSet {
+    #[serde(rename = "x spacing mm")]
+    pub x_spacing: f64,
+    #[serde(rename = "left margin mm")]
+    pub left_margin: f64,
+    #[serde(rename = "right margin mm")]
+    pub right_margin: f64,
+    #[serde(rename = "thickness pt")]
+    pub thickness: f64,
+    #[serde(rename = "color cmyk")]
+    pub color: CmykDef
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub enum LineSet {
     #[serde(rename = "slant")]
     Slant (SlantLineSet),
@@ -70,8 +98,14 @@ pub enum LineSet {
     #[serde(rename = "seyes")]
     Seyes (SeyesLineSet),
 
+    #[serde(rename = "horizontal lines")]
+    HorizontalLines (HorizontalLineSet),
+
+    #[serde(rename = "vertical lines")]
+    VerticalLines (VerticalLineSet),
+
     #[serde(rename = "single line")]
-    SingleLine(LineDef)
+    SingleLine (LineDef)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -111,7 +145,7 @@ mod tests {
         if let LineSet::Slant(slant_lines) = &gdef.line_sets[0] {
             assert_eq!(slant_lines.x_spacing, 10.0);
             assert_eq!(slant_lines.slant_angle, 52.0);
-            assert_eq!(slant_lines.thickness, 0.4);
+            assert_eq!(slant_lines.thickness, 0.1);
             assert_eq!(slant_lines.color, CmykDef(0.02, 0.34, 0.0, 0.12));
         } else {
             panic!("The first line set is supposed to be the slant lines.");
@@ -121,7 +155,7 @@ mod tests {
             assert_eq!(seyes_lines.y_spacing, 2.0);
             assert_eq!(seyes_lines.top_margin, 30.0);
             assert_eq!(seyes_lines.bottom_margin, 20.0);
-            assert_eq!(seyes_lines.base_thickness, 0.5);
+            assert_eq!(seyes_lines.base_thickness, 0.4);
             assert_eq!(seyes_lines.base_color, CmykDef(0.02, 0.34, 0.0, 0.12));
             assert_eq!(seyes_lines.aux_thickness, 0.1);
             assert_eq!(seyes_lines.aux_color, CmykDef(0.02, 0.34, 0.0, 0.12));
@@ -135,11 +169,53 @@ mod tests {
             assert_eq!(line.end.x, 30.0);
             assert_eq!(line.end.y, 0.0);
             assert_eq!(line.thickness, 0.4);
-            assert_eq!(line.color, CmykDef(0.02, 0.34, 0.0, 0.12));
+            assert_eq!(line.color, CmykDef(0.0, 0.36, 0.26, 0.04));
         } else {
             panic!("The third line set is supposed to be a single vertical line.");
         }
     }
+
+    #[test]
+    fn parse_5mm_square_yml() {
+        let yml = fs::read_to_string("test_line_defs/letter_5mm_square.yml").unwrap();
+        let gdef: GeometryDef = serde_yaml::from_str(&yml).unwrap();
+
+        assert_eq!(gdef.paper_size.width, PaperSize::LETTER_PORTRAIT.width);
+        assert_eq!(gdef.paper_size.height, PaperSize::LETTER_PORTRAIT.height);
+
+        assert_eq!(gdef.line_sets.len(), 3);
+
+        if let LineSet::HorizontalLines(h_lines) = &gdef.line_sets[0] {
+            assert_eq!(h_lines.y_spacing, 5.0);
+            assert_eq!(h_lines.thickness, 0.1);
+            assert_eq!(h_lines.top_margin, 30.0);
+            assert_eq!(h_lines.bottom_margin, 20.0);
+            assert_eq!(h_lines.color, CmykDef(0.02, 0.34, 0.0, 0.12));
+        } else {
+            panic!("The first line set is supposed to be the horizontal lines.");
+        }
+
+        if let LineSet::VerticalLines(v_lines) = &gdef.line_sets[1] {
+            assert_eq!(v_lines.x_spacing, 5.0);
+            assert_eq!(v_lines.thickness, 0.1);
+            assert_eq!(v_lines.left_margin, 30.0);
+            assert_eq!(v_lines.right_margin, 20.0);
+            assert_eq!(v_lines.color, CmykDef(0.02, 0.34, 0.0, 0.12));
+        } else {
+            panic!("The second line set is supposed to be the horizontal lines.");
+        }
+ 
+        if let LineSet::SingleLine(line) = &gdef.line_sets[2] {
+            assert_eq!(line.start.x, 30.0);
+            assert_eq!(line.start.y, PaperSize::LETTER_PORTRAIT.height);
+            assert_eq!(line.end.x, 30.0);
+            assert_eq!(line.end.y, 0.0);
+            assert_eq!(line.thickness, 0.4);
+            assert_eq!(line.color, CmykDef(0.0, 0.36, 0.26, 0.04));
+        } else {
+            panic!("The third line set is supposed to be a single vertical line.");
+        }
+   }
 
     impl PartialEq for CmykDef {
         fn eq(&self, other: &Self) -> bool {
