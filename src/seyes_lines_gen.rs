@@ -42,7 +42,7 @@ pub fn create_seyes_lines(line_set: &SeyesLineSet, paper_size: &PaperSize, resul
         add_line(y, line_set.aux_thickness, &line_set.aux_color);
     }
 
-    while y + (4.0 * line_set.y_spacing) >= line_set.bottom_margin {
+    while y - (4.0 * line_set.y_spacing) >= line_set.bottom_margin {
         y -= line_set.y_spacing;
         add_line(y, line_set.aux_thickness, &line_set.aux_color);
         y -= line_set.y_spacing;
