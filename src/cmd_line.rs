@@ -17,6 +17,10 @@ pub struct CmdLineOpts {
     /// Output PDF file name
     #[structopt(parse(from_os_str))]
     pub output_pdf: PathBuf,
+
+    /// Number of pages to generate
+    #[structopt(short, long, default_value = "1")]
+    pub num_pages: u32
 }
 
 pub fn parse_cmd_line() -> Result<CmdLineOpts, Error> {
@@ -49,6 +53,7 @@ mod test {
         let opts = parse(&cmd_line);
         assert_eq!(&opts.input_yaml, &OsStr::new("test_line_defs/letter_seyes_slant52.yml"));
         assert_eq!(&opts.output_pdf, &OsStr::new("./test_page_test01.pdf"));
+        assert_eq!(opts.num_pages, 1);
     }
 
     #[test]
@@ -58,7 +63,7 @@ mod test {
 
         let usage_rx = Regex::new(r"(?xm)
             ^USAGE:$  \s*
-                ^\s+lined_paper_pdf\s<input-yaml>\s<output-pdf>\s*$")
+                ^\s+lined_paper_pdf\s\[OPTIONS\]\s<input-yaml>\s<output-pdf>\s*$")
             .unwrap();
 
         let file_args_rx = Regex::new(r"(?xm)

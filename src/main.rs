@@ -32,7 +32,7 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    pdf_gen::create_pdf(&gdef.paper_size, &lines, &opts.output_pdf)?;
+    pdf_gen::create_pdf(&gdef.paper_size, &lines, opts.num_pages, &opts.output_pdf)?;
     Ok(())
 }
 
