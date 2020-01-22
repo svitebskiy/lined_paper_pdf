@@ -8,7 +8,7 @@ pub struct SlantLineOpt {
 }
 
 #[derive(StructOpt, Debug)]
-#[structopt(name = "lined_paper_pdf")]
+#[structopt(name = "lined_paper_pdf", about = "Generates PDF of lined paper for writing or drawing.")]
 pub struct CmdLineOpts {
     /// Input paper & line set definition YAML file
     #[structopt(parse(from_os_str))]
@@ -23,15 +23,44 @@ pub struct CmdLineOpts {
     pub num_pages: u32
 }
 
-pub fn parse_cmd_line() -> Result<CmdLineOpts, Error> {
-    let opt = CmdLineOpts::from_iter_safe(std::env::args_os())?;
-    Ok(opt)
+#[derive(Debug)]
+pub enum CmdLine {
+    Opts (CmdLineOpts),
+    Help (String)
+}
+
+pub fn parse_cmd_line() -> Result<CmdLine, Error> {
+    let args = std::env::args_os();
+    if args.len() < 2 {
+        let mut short_help: Vec<u8> = Vec::new();
+        let app = CmdLineOpts::clap();
+        app.write_help(&mut short_help)?;
+        return Ok(CmdLine::Help(String::from_utf8(short_help)?));
+    }
+
+    let opt = CmdLineOpts::from_iter_safe(args);
+    match opt {
+        Ok(opt) => Ok(CmdLine::Opts(opt)),
+        Err(e) if e.kind == clap::ErrorKind::HelpDisplayed => {
+            let mut long_help: Vec<u8> = Vec::new();
+            let app = CmdLineOpts::clap();
+            app.write_help(&mut long_help)?;
+            Ok(CmdLine::Help(String::from_utf8(long_help)?))
+        },
+        Err(e) => Err(e.into())
+    }
 }
 
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Failed to parse command line arguments.")]
-    ClapError(#[from] clap::Error)
+    ClapError(#[from] clap::Error),
+
+    #[error("IO Error.")]
+    IOError(#[from] std::io::Error),
+
+    #[error("UTF8 verification error.")]
+    UTF8Error(#[from] std::string::FromUtf8Error)
 }
 
 #[cfg(test)]

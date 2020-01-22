@@ -7,10 +7,17 @@ mod horizontal_lines_gen;
 mod vertical_lines_gen;
 
 use thiserror::Error;
+use cmd_line::CmdLine;
 use geometry_def::{LineDef, GeometryDef, LineSet};
 
 fn main() -> Result<(), Error> {
-    let opts = cmd_line::parse_cmd_line()?;
+    let opts = match cmd_line::parse_cmd_line()? {
+        CmdLine::Help(h) => {
+            println!("{}", h);
+            return Ok(());
+        },
+        CmdLine::Opts(opt) => opt
+    };
 
     let gdef = std::fs::File::open(opts.input_yaml)?;
     let gdef: GeometryDef = serde_yaml::from_reader(gdef)?;
