@@ -31,7 +31,8 @@ pub fn create_horizontal_lines(line_set: &HorizontalLineSet, paper_size: &PaperS
             start: PointDef { x: 0.0, y: y },
             end: PointDef { x: paper_size.width, y: y },
             thickness: line_set.thickness,
-            color: line_set.color
+            color: line_set.color,
+            dash_pattern: line_set.dash_pattern
         });
         y -= line_set.y_spacing;
     }

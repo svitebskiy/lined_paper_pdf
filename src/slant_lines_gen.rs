@@ -33,7 +33,8 @@ pub fn create_slant_lines(line_set: &SlantLineSet, paper_size: &PaperSize, resul
             start: PointDef {x: x0, y: y0},
             end: PointDef {x: x1, y: y1},
             thickness: line_set.thickness,
-            color: line_set.color
+            color: line_set.color,
+            dash_pattern: None
         });
     };
 

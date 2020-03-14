@@ -1,0 +1,34 @@
+paper size:
+  width mm: 215.9
+  height mm: 279.4
+
+# This test file has one of every supported line set type.
+# The geometry definition file can have as many or as few line sets as needed.
+# The same type of line set can be added more than once.
+line sets:
+  -
+    horizontal lines:
+      y spacing mm: 6.0
+      top margin mm: 30.0
+      bottom margin mm: 20.0
+      thickness pt: 0.8                     # 0pt thinkness is allowed and it means a signle device pixel or dot
+      color cmyk: [0.02, 0.34, 0.0, 0.12]   # Each CMYK value must be between 0.0 and 1.0
+      dash pattern:
+        # Dash pattern units should non-negative whole numbers.
+        # Dash units are not millimeter or points, but still close to points.
+        # 0 = line thickness, so below pattern makes for a line of 0.8pt diameter dots.
+        dash: 0
+        gap: 4
+  -
+    single line:
+      start:
+        x mm: 30.0
+        y mm: 279.4
+      end:
+        x mm: 30.0
+        y mm: 0.0
+      thickness pt: 0.4
+      color cmyk: [0.0, 0.36, 0.26, 0.04]
+      dash pattern:
+        dash: 2
+        gap: 2

@@ -31,7 +31,8 @@ pub fn create_vertical_lines(line_set: &VerticalLineSet, paper_size: &PaperSize,
             start: PointDef { x: x, y: 0.0 },
             end: PointDef { x: x, y: paper_size.height },
             thickness: line_set.thickness,
-            color: line_set.color
+            color: line_set.color,
+            dash_pattern: line_set.dash_pattern
         });
         x += line_set.x_spacing;
     }

@@ -29,7 +29,8 @@ pub fn create_seyes_lines(line_set: &SeyesLineSet, paper_size: &PaperSize, resul
             start: PointDef { x: 0.0, y: y },
             end: PointDef { x: paper_size.width, y: y },
             thickness: thickness,
-            color: *color
+            color: *color,
+            dash_pattern: None
         });
     };
 

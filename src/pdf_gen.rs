@@ -1,7 +1,7 @@
 use crate::geometry_def::{PaperSize, LineDef};
 use std::path::Path;
 use thiserror::Error;
-use printpdf::{PdfDocument, Mm, Point, Line, LineCapStyle, Color, Cmyk};
+use printpdf::{PdfDocument, Mm, Point, Line, LineCapStyle, Color, Cmyk, LineDashPattern};
 use printpdf::types::PdfLayerReference;
 
 pub const MIN_NUM_PAGES: u32 = 1;
@@ -23,7 +23,18 @@ pub fn create_pdf(paper_size: &PaperSize, lines: &[LineDef], num_pages: u32, pdf
             layer.set_outline_thickness(line.thickness); // In pts, 0 is a special value for exactly 1 device px
             layer.set_outline_color(Color::Cmyk(Cmyk::new(
                 line.color.0, line.color.1, line.color.2, line.color.3, None))); // 1.0 = 100%
-        
+
+            if let Some(dp) = &line.dash_pattern {
+                let mut dash_pattern = LineDashPattern::default();
+                dash_pattern.dash_1 = Some(dp.dash);
+                if let Some(gap) = dp.gap {
+                    dash_pattern.gap_1 = Some(gap);
+                }
+                layer.set_line_dash_pattern(dash_pattern);
+            } else {
+                layer.set_line_dash_pattern(LineDashPattern::default());
+            }
+
             let points = vec![
                 (Point::new(Mm(line.start.x), Mm(line.start.y)), false),
                 (Point::new(Mm(line.end.x), Mm(line.end.y)), false)

@@ -1,13 +1,19 @@
 use serde;
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct PointDef {
     #[serde(rename = "x mm")]
     pub x: f64,
 
     #[serde(rename = "y mm")]
     pub y: f64
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+pub struct DashPatternDef {
+    pub dash: i64,
+    pub gap: Option<i64>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -17,7 +23,9 @@ pub struct LineDef {
     #[serde(rename = "thickness pt")]
     pub thickness: f64,
     #[serde(rename = "color cmyk")]
-    pub color: CmykDef
+    pub color: CmykDef,
+    #[serde(rename = "dash pattern")]
+    pub dash_pattern: Option<DashPatternDef>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -73,7 +81,9 @@ pub struct HorizontalLineSet {
     #[serde(rename = "thickness pt")]
     pub thickness: f64,
     #[serde(rename = "color cmyk")]
-    pub color: CmykDef
+    pub color: CmykDef,
+    #[serde(rename = "dash pattern")]
+    pub dash_pattern: Option<DashPatternDef>  
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -87,7 +97,9 @@ pub struct VerticalLineSet {
     #[serde(rename = "thickness pt")]
     pub thickness: f64,
     #[serde(rename = "color cmyk")]
-    pub color: CmykDef
+    pub color: CmykDef,
+    #[serde(rename = "dash pattern")]
+    pub dash_pattern: Option<DashPatternDef>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -216,6 +228,45 @@ mod tests {
             panic!("The third line set is supposed to be a single vertical line.");
         }
    }
+
+   #[test]
+   fn parse_letter_dashed_6mm() {
+       let yml = fs::read_to_string("test_line_defs/letter_dashed_6mm.yml").unwrap();
+       let gdef: GeometryDef = serde_yaml::from_str(&yml).unwrap();
+
+       assert_eq!(gdef.paper_size.width, PaperSize::LETTER_PORTRAIT.width);
+       assert_eq!(gdef.paper_size.height, PaperSize::LETTER_PORTRAIT.height);
+
+       if let LineSet::HorizontalLines(h_lines) = &gdef.line_sets[0] {
+            assert_eq!(h_lines.y_spacing, 6.0);
+            assert_eq!(h_lines.thickness, 0.8);
+            assert_eq!(h_lines.top_margin, 30.0);
+            assert_eq!(h_lines.bottom_margin, 20.0);
+            assert_eq!(h_lines.color, CmykDef(0.02, 0.34, 0.0, 0.12));
+
+            match h_lines.dash_pattern {
+                Some(dp) => {
+                    assert_eq!(dp.dash, 0);
+                    assert_eq!(dp.gap.unwrap(), 4);
+                },
+                None => panic!("Expecting dash pattern in the horizontal lines.")
+            }
+        } else {
+            panic!("The first line set is supposed to be the horizontal lines.");
+        }
+
+        if let LineSet::SingleLine(s_line) = &gdef.line_sets[1] {
+            match s_line.dash_pattern {
+                Some(dp) => {
+                    assert_eq!(dp.dash, 2);
+                    assert_eq!(dp.gap.unwrap(), 2);
+                },
+                None => panic!("Expecting dash pattern in the horizontal lines.")
+            }
+        } else {
+            panic!("The second line set is supposed to be a single line.");
+        }
+    }
 
     impl PartialEq for CmykDef {
         fn eq(&self, other: &Self) -> bool {
