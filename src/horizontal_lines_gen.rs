@@ -1,7 +1,9 @@
 use crate::geometry_def::{LineDef, PointDef, PaperSize, HorizontalLineSet};
+use crate::geometry_def::coord::Coord;
 use thiserror::Error;
 
-pub fn create_horizontal_lines(line_set: &HorizontalLineSet, paper_size: &PaperSize, result: &mut Vec<LineDef>)
+pub fn create_horizontal_lines(line_set: &HorizontalLineSet, paper_size: &PaperSize,
+    result: &mut Vec<LineDef>)
     -> Result<(), Error>
 {
     if paper_size.width <= 0.0 {
@@ -28,8 +30,8 @@ pub fn create_horizontal_lines(line_set: &HorizontalLineSet, paper_size: &PaperS
 
     while y >= line_set.bottom_margin {
         result.push(LineDef {
-            start: PointDef { x: 0.0, y: y },
-            end: PointDef { x: paper_size.width, y: y },
+            start: PointDef { x: Coord::OffZero(0.0), y: Coord::OffZero(y) },
+            end: PointDef { x: Coord::OffFarEdge(0.0), y: Coord::OffZero(y) },
             thickness: line_set.thickness,
             color: line_set.color,
             dash_pattern: line_set.dash_pattern

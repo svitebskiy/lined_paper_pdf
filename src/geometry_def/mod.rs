@@ -1,22 +1,24 @@
-use serde;
-use serde::{Serialize, Deserialize};
+pub mod coord;
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+use serde::{self, Deserialize};
+use coord::Coord;
+
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct PointDef {
     #[serde(rename = "x mm")]
-    pub x: f64,
+    pub x: Coord,
 
     #[serde(rename = "y mm")]
-    pub y: f64
+    pub y: Coord
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct DashPatternDef {
     pub dash: i64,
     pub gap: Option<i64>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct LineDef {
     pub start: PointDef,
     pub end: PointDef,
@@ -28,7 +30,7 @@ pub struct LineDef {
     pub dash_pattern: Option<DashPatternDef>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct PaperSize {
     #[serde(rename = "width mm")]
     pub width: f64,
@@ -37,10 +39,10 @@ pub struct PaperSize {
     pub height: f64
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct CmykDef (pub f64, pub f64, pub f64, pub f64);
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct SlantLineSet {
     #[serde(rename = "x spacing mm")]
     pub x_spacing: f64,
@@ -52,7 +54,7 @@ pub struct SlantLineSet {
     pub color: CmykDef
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct SeyesLineSet {
     #[serde(rename = "y spacing mm")]
     pub y_spacing: f64,
@@ -70,7 +72,7 @@ pub struct SeyesLineSet {
     pub aux_color: CmykDef
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HorizontalLineSet {
     #[serde(rename = "y spacing mm")]
     pub y_spacing: f64,
@@ -86,7 +88,7 @@ pub struct HorizontalLineSet {
     pub dash_pattern: Option<DashPatternDef>  
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct VerticalLineSet {
     #[serde(rename = "x spacing mm")]
     pub x_spacing: f64,
@@ -102,7 +104,7 @@ pub struct VerticalLineSet {
     pub dash_pattern: Option<DashPatternDef>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub enum LineSet {
     #[serde(rename = "slant")]
     Slant (SlantLineSet),
@@ -120,12 +122,28 @@ pub enum LineSet {
     SingleLine (LineDef)
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct GeometryDef {
     #[serde(rename = "paper size")]
     pub paper_size: PaperSize,
     #[serde(rename = "line sets")]
     pub line_sets: Vec<LineSet>
+}
+
+impl PointDef {
+    pub fn x_coord(&self, paper_size: &PaperSize) -> f64 {
+        match self.x {
+            Coord::OffZero(v) => v,
+            Coord::OffFarEdge(v) => paper_size.width - v
+        }
+    }
+
+    pub fn y_coord(&self, paper_size: &PaperSize) -> f64 {
+        match self.y {
+            Coord::OffZero(v) => v,
+            Coord::OffFarEdge(v) => paper_size.height - v
+        }
+    }
 }
 
 #[cfg(test)]
@@ -176,10 +194,10 @@ mod tests {
         }
 
         if let LineSet::SingleLine(line) = &gdef.line_sets[2] {
-            assert_eq!(line.start.x, 30.0);
-            assert_eq!(line.start.y, PaperSize::LETTER_PORTRAIT.height);
-            assert_eq!(line.end.x, 30.0);
-            assert_eq!(line.end.y, 0.0);
+            assert_eq!(line.start.x_coord(&gdef.paper_size), 30.0);
+            assert_eq!(line.start.y_coord(&gdef.paper_size), PaperSize::LETTER_PORTRAIT.height);
+            assert_eq!(line.end.x_coord(&gdef.paper_size), 30.0);
+            assert_eq!(line.end.y_coord(&gdef.paper_size), 0.0);
             assert_eq!(line.thickness, 0.4);
             assert_eq!(line.color, CmykDef(0.0, 0.36, 0.26, 0.04));
         } else {
@@ -218,10 +236,10 @@ mod tests {
         }
  
         if let LineSet::SingleLine(line) = &gdef.line_sets[2] {
-            assert_eq!(line.start.x, 30.0);
-            assert_eq!(line.start.y, PaperSize::LETTER_PORTRAIT.height);
-            assert_eq!(line.end.x, 30.0);
-            assert_eq!(line.end.y, 0.0);
+            assert_eq!(line.start.x_coord(&gdef.paper_size), 30.0);
+            assert_eq!(line.start.y_coord(&gdef.paper_size), PaperSize::LETTER_PORTRAIT.height);
+            assert_eq!(line.end.x_coord(&gdef.paper_size), 30.0);
+            assert_eq!(line.end.y_coord(&gdef.paper_size), 0.0);
             assert_eq!(line.thickness, 0.4);
             assert_eq!(line.color, CmykDef(0.0, 0.36, 0.26, 0.04));
         } else {

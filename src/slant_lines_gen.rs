@@ -1,4 +1,5 @@
 use crate::geometry_def::{LineDef, PointDef, PaperSize, SlantLineSet};
+use crate::geometry_def::coord::Coord;
 use thiserror::Error;
 
 pub fn create_slant_lines(line_set: &SlantLineSet, paper_size: &PaperSize, result: &mut Vec<LineDef>)
@@ -30,8 +31,8 @@ pub fn create_slant_lines(line_set: &SlantLineSet, paper_size: &PaperSize, resul
 
     let mut add_line_to_result = |x0, y0, x1, y1| {
         result.push(LineDef {
-            start: PointDef {x: x0, y: y0},
-            end: PointDef {x: x1, y: y1},
+            start: PointDef {x: Coord::OffZero(x0), y: Coord::OffZero(y0)},
+            end: PointDef {x: Coord::OffZero(x1), y: Coord::OffZero(y1)},
             thickness: line_set.thickness,
             color: line_set.color,
             dash_pattern: None
@@ -113,8 +114,8 @@ mod tests {
             paper_size, &mut result)
             .unwrap();
         assert!(result.len() > 2);
-        assert_eq!(result[0].end.x, 0.0);
-        assert_eq!(result.last().unwrap().end.y, 0.0);
+        assert_eq!(result[0].end.x_coord(&paper_size), 0.0);
+        assert_eq!(result.last().unwrap().end.y_coord(&paper_size), 0.0);
         for line in result.iter() {
             check_line(line, paper_size);
         }
@@ -129,23 +130,23 @@ mod tests {
             paper_size, &mut result)
             .unwrap();
         assert!(result.len() > 2);
-        assert_eq!(result[0].end.x, 0.0);
-        assert_eq!(result[result.len() / 2].start.y, paper_size.height);
-        assert_eq!(result[result.len() / 2].end.y, 0.0);
-        assert!(result[result.len() / 2].start.x > 0.0);
-        assert!(result[result.len() / 2].end.x > 0.0);
-        assert!(result[result.len() / 2].end.x < result[result.len() / 2].start.x);
-        assert_eq!(result.last().unwrap().end.y, 0.0);
+        assert_eq!(result[0].end.x_coord(&paper_size), 0.0);
+        assert_eq!(result[result.len() / 2].start.y_coord(&paper_size), paper_size.height);
+        assert_eq!(result[result.len() / 2].end.y_coord(&paper_size), 0.0);
+        assert!(result[result.len() / 2].start.x_coord(&paper_size) > 0.0);
+        assert!(result[result.len() / 2].end.x_coord(&paper_size) > 0.0);
+        assert!(result[result.len() / 2].end.x_coord(&paper_size) < result[result.len() / 2].start.x_coord(&paper_size));
+        assert_eq!(result.last().unwrap().end.y_coord(&paper_size), 0.0);
         for line in result.iter() {
             check_line(line, paper_size);
         }
     }
 
     fn check_line(line: &LineDef, paper_size: &PaperSize) {
-        let x0 = line.start.x;
-        let y0 = line.start.y;
-        let x1 = line.end.x;
-        let y1 = line.end.y;
+        let x0 = line.start.x_coord(&paper_size);
+        let y0 = line.start.y_coord(&paper_size);
+        let x1 = line.end.x_coord(&paper_size);
+        let y1 = line.end.y_coord(&paper_size);
         assert!(0.0 <= x0);
         assert!(x0 <= paper_size.width);
         assert!(0.0 <= x1);

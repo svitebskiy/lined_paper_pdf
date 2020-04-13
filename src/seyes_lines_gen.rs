@@ -1,4 +1,5 @@
 use crate::geometry_def::{LineDef, PointDef, PaperSize, SeyesLineSet, CmykDef};
+use crate::geometry_def::coord::Coord;
 use thiserror::Error;
 
 pub fn create_seyes_lines(line_set: &SeyesLineSet, paper_size: &PaperSize, result: &mut Vec<LineDef>)
@@ -26,8 +27,8 @@ pub fn create_seyes_lines(line_set: &SeyesLineSet, paper_size: &PaperSize, resul
 
     let mut add_line = |y, thickness, color: &CmykDef| {
         result.push(LineDef {
-            start: PointDef { x: 0.0, y: y },
-            end: PointDef { x: paper_size.width, y: y },
+            start: PointDef { x: Coord::OffZero(0.0), y: Coord::OffZero(y) },
+            end: PointDef { x: Coord::OffFarEdge(0.0), y: Coord::OffZero(y) },
             thickness: thickness,
             color: *color,
             dash_pattern: None

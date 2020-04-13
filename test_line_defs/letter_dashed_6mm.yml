@@ -23,7 +23,8 @@ line sets:
     single line:
       start:
         x mm: 30.0
-        y mm: 279.4
+        y mm:
+          off far edge: 0.0                 # "off far edge" means paper width or height minus this number
       end:
         x mm: 30.0
         y mm: 0.0

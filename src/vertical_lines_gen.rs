@@ -1,4 +1,5 @@
 use crate::geometry_def::{LineDef, PointDef, PaperSize, VerticalLineSet};
+use crate::geometry_def::coord::Coord;
 use thiserror::Error;
 
 pub fn create_vertical_lines(line_set: &VerticalLineSet, paper_size: &PaperSize, result: &mut Vec<LineDef>)
@@ -28,8 +29,8 @@ pub fn create_vertical_lines(line_set: &VerticalLineSet, paper_size: &PaperSize,
 
     while x <= paper_size.width - line_set.right_margin {
         result.push(LineDef {
-            start: PointDef { x: x, y: 0.0 },
-            end: PointDef { x: x, y: paper_size.height },
+            start: PointDef { x: Coord::OffZero(x), y: Coord::OffZero(0.0) },
+            end: PointDef { x: Coord::OffZero(x), y: Coord::OffFarEdge(0.0) },
             thickness: line_set.thickness,
             color: line_set.color,
             dash_pattern: line_set.dash_pattern

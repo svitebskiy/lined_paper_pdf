@@ -36,8 +36,8 @@ pub fn create_pdf(paper_size: &PaperSize, lines: &[LineDef], num_pages: u32, pdf
             }
 
             let points = vec![
-                (Point::new(Mm(line.start.x), Mm(line.start.y)), false),
-                (Point::new(Mm(line.end.x), Mm(line.end.y)), false)
+                (Point::new(Mm(line.start.x_coord(&paper_size)), Mm(line.start.y_coord(&paper_size))), false),
+                (Point::new(Mm(line.end.x_coord(&paper_size)), Mm(line.end.y_coord(&paper_size))), false)
             ];
 
             let line = Line {
