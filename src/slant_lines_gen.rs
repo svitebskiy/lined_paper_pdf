@@ -90,7 +90,7 @@ pub enum Error {
     #[error("Line spacing of {0} is not a positive number.")]
     LineSpacingIsNotPositive(f64),
 
-    #[error("Paper witdth of {0} is not a positive number.")]
+    #[error("Paper width of {0} is not a positive number.")]
     PaperWidthIsNotPositive(f64),
 
     #[error("Paper height of {0} is not a positive number.")]

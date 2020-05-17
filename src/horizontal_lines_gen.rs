@@ -44,7 +44,7 @@ pub fn create_horizontal_lines(line_set: &HorizontalLineSet, paper_size: &PaperS
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("Paper witdth of {0} is not a positive number.")]
+    #[error("Paper width of {0} is not a positive number.")]
     PaperWidthIsNotPositive(f64),
 
     #[error("Paper height of {0} is not a positive number.")]
