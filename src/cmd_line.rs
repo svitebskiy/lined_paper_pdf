@@ -3,11 +3,6 @@ use structopt::StructOpt;
 use thiserror::Error;
 
 #[derive(StructOpt, Debug)]
-pub struct SlantLineOpt {
-
-}
-
-#[derive(StructOpt, Debug)]
 #[structopt(name = "lined_paper_pdf", about = "Generates PDF of lined paper for writing or drawing.")]
 pub struct CmdLineOpts {
     /// Input paper & line set definition YAML file
