@@ -9,9 +9,9 @@ pub enum Coord {
 }
 
 #[derive(Debug, Deserialize)]
-struct FromFarEdgeCoord {
+struct OffFarEdgeCoord {
     #[serde(rename = "off far edge")]
-    from_far_edge: f64
+    off_far_edge: f64
 }
 
 struct CoordVisitor;
@@ -30,8 +30,8 @@ impl<'de> Visitor<'de> for CoordVisitor {
 
     fn visit_map<A>(self, map: A) -> Result<Self::Value, A::Error>
     where A: de::MapAccess<'de> {
-        let ffe: FromFarEdgeCoord = Deserialize::deserialize(de::value::MapAccessDeserializer::new(map))?;
-        Ok(Coord::OffFarEdge(ffe.from_far_edge))
+        let ofe: OffFarEdgeCoord = Deserialize::deserialize(de::value::MapAccessDeserializer::new(map))?;
+        Ok(Coord::OffFarEdge(ofe.off_far_edge))
     }
 }
 
